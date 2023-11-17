@@ -1,5 +1,5 @@
 # Step 1 - TLDs
-1. Identify TLDs 
+Identify TLDs 
     - HackerOne/Bugcrowd/Custom Scope
     - Crunchbase
     - Google
@@ -10,9 +10,8 @@
         - org: "company name"
         - net: "CIDR"
         - port: 80,443
-2. Review ASN Data in ars0n
 
-### TLDs
+### TLDs to target
 - 
 - 
 - 
@@ -28,7 +27,7 @@
 4. Perform DNS recon on interesting subs
     - `dnsrecon -t axfr -d domain`
 
-### Interesting Subdomains
+### Interesting Subdomains to target
 - 
 - 
 - 
@@ -45,9 +44,9 @@
 - Find Users with public repos that may be relevant
     - `python3 github-users.py -k floqast`
 - Run github_brute-dork.py 
-    - `python3 github_brutedork.py -u blackblastie -t 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 -o indeedeng`
+    - `python3 github_brutedork.py -u blackblastie -t <gh-pat> -o <organization>`
 - Run Trufflehog against interesting users and/or repos
-    - `curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer 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" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/users/<USERNAME>/repos?per_page=100 | jq .[].git_url -r | sed 's/git:/https:/' | sudo xargs -I % trufflehog github --repo=%`
+    - `curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <gh-pat>" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/users/<USERNAME>/repos?per_page=100 | jq .[].git_url -r | sed 's/git:/https:/' | sudo xargs -I % trufflehog github --repo=%`
     
 
 # Step 6 - Cloud
@@ -245,7 +244,7 @@
 2FA/MFA Bypass
     - To Do: Build Methodology
 - Oauth account takeover
-    - Look at Oauth methodology
+    - Look at (Oauth methodology)[./tech-specific-methodologies/Oauth-Methodology.md]
 - SAML Misconfiguration
     - to do: build methodology
 - Google Firebase IAM Misconfig
