@@ -69,7 +69,7 @@ Identify TLDs
 - 
 - 
 
-# Step 7 -3 Manual Testing
+# Step 7 - Manual Testing
 ### Take all interesting endpoints and manually test them
 ### Application Analysis
 
