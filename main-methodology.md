@@ -1,15 +1,15 @@
 # Step 1 - TLDs
 Identify TLDs 
-    - HackerOne/Bugcrowd/Custom Scope
-    - Crunchbase
-    - Google
-        - site:targetdomain.com -site:www.targetdomain.com 
-        - TO DO: find more dorks
-    - Manual search of crt.sh 
-    - Shodan
-        - org: "company name"
-        - net: "CIDR"
-        - port: 80,443
+- HackerOne/Bugcrowd/Custom Scope
+- Crunchbase
+- Google
+    - site:targetdomain.com -site:www.targetdomain.com 
+    - TO DO: find more dorks
+- Manual search of crt.sh 
+- Shodan
+    - org: "company name"
+    - net: "CIDR"
+    - port: 80,443
 
 ### TLDs to target
 - 
@@ -244,7 +244,7 @@ Identify TLDs
 2FA/MFA Bypass
     - To Do: Build Methodology
 - Oauth account takeover
-    - Look at (Oauth methodology)[./tech-specific-methodologies/Oauth-Methodology.md]
+    - Look at [Oauth methodology](./tech-specific-methodologies/Oauth-Methodology.md)
 - SAML Misconfiguration
     - to do: build methodology
 - Google Firebase IAM Misconfig
