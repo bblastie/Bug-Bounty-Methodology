@@ -73,26 +73,66 @@ Identify TLDs
 ### Take all interesting endpoints and manually test them
 ### Application Analysis
 
+- What stack/languages are used?
+- What server is running the application?
+- Is there a WAF?
+-  What additional libraries are used? Are there known exploits for these libraries?  Custom JS Llbraries?
+- Is there Authentication? 
+    - OAuth through Google/Facebook
+- What Objects are used?
+- How is session established?
+- Are there useful comments?
+- How does it handle special characters?
+- What common features are present?
+- How is a user identified?
+- Are there multiple user roles?
+- Is there an API?
+- Is there an Content Management System?
+- Is there a Content Security Policy?
+- Is CORS implemented?
 - How does the app pass data?
+- Are WebSockets used?
 - How/where does the app talk about users?
-- Does the site have multi-tenancy or user levels?
+- Does the site have multi-tenancy?
+- Is the source code publicly available?
 - Does the site have a unique threat model?  
 - Has there been past security research and vulns?
 - How does the app handle common vuln classes?
 - Where does the app store data?
+
+### Ask yourself these questions for EVERY page
+
+1. What part of CRUD?
+2. What HTTP request methods can be used? (GET/POST/PUT/DELETE/etc.)
+3. What parameters can be used?
+
 
 #### Analysis notes
 - 
 - 
 - 
 
+#### Tech Profile  
+- Web Server: 
+- Database: Mongo?  
+- Cloud Provider: Azure and AWS
+- WAF:
+- CMS:
+- Framework: React
+- Programming Language: JS
+- Other: Lodash (proto pollution)
+
 ### Manual Recon
 - Identify web server, technology, and database
 - Try to locate /robots.txt , /crossdomain.xml /clientaccesspolicy.xml /sitemap.xml and /.well-known/
 - Review comments on source code (Burp Engagement Tools)
-- Directory Enumeration
-    - https://pentestbook.six2dez.com/enumeration/web/crawl-fuzz
+- Content Discovery
+    - Step 1 - Click through the app 
+    - Step 2 - Burp Crawl
+    - Step 3 - `Discover Content` in Burp (Right click on target in Target tab)
+    - Step 4 - Intruder fuzzing with small raft payload list
 - Web Fuzzing 
+    - Burp Param Miner
     - https://github.com/six2dez/OneListForAll
     - To Do: Learn more about how and where to fuzz
 - Identify WAF 
@@ -101,25 +141,10 @@ Identify TLDs
     - https://github.com/1ndianl33t/Gf-Patterns
 - Scan for XSS 
     - https://github.com/hahwul/dalfox
-- Try locate admin and login panel
+- Try locate admin panel
 - Analyze JS files via burp 
     - https://github.com/xnl-h4ck3r/xnLinkFinder
 - Content Discovery via walking the app
-
-#### Tech Profile  
-- Web Server: 
-- Database: 
-- Cloud Provider: 
-- WAF:
-- CMS:
-- Framework:
-- Programming Language:
-- Other:
-
-#### Interesting Manual Recon finds
-- 
--
--
 
 ### Reverse Proxy Testing
 - HTTP header injection in GET & POST (X Forwarded Host) 
