@@ -1,55 +1,86 @@
-# Step 1 - TLDs
-Identify TLDs 
+# Step 1a - Automated Recon
+## Identify TLDs 
 - HackerOne/Bugcrowd/Custom Scope
-- Crunchbase
+
+## Automated Recon
+- Run ars0n for automated enumeration to cover most beginning steps
+    - https://github.com/R-s0n/ars0n-framework 
+
+# Step 1b - Additional TLDs and Manual Recon
+- Acquisitions
+    - https://www.crunchbase.com/
+    - https://pitchbook.com/profiles/company/10377-37
 - Google
     - site:targetdomain.com -site:www.targetdomain.com 
     - TO DO: find more dorks
 - Manual search of crt.sh 
-- Shodan
-    - org: "company name"
-    - net: "CIDR"
-    - port: 80,443
+- check_mdi.py -d `target.com`
+- Look for ASNs
+    - https://bgp.he.net/
+    - https://dnschecker.org 
+- Port Scan ASN IP Ranges and IPs in ars0n
+    - Naabu + ASNmap
+        - `echo AS394161 | asnmap -silent | naabu -silent -nmap-cli 'nmap -sV'`
+    - ars0n data set 
+        - `python3 ip-parser.py` 
+        - `cat ../temp/floqast.app.txt | naabu -p - -silent -nmap-cli 'nmap -sV'`
+- Shodan Passive Anaylsis
+    - Karmav2 
+        - `bash karma_v2 -d tesla.com --limit -1 -deep`
+    - Shosubgo
+        - `shosubgo -d tesla.com -s YOURAPIKEY`
+    - smap
+        - passive shodan port scans (does not touch target)
+        - `smap tesla.com`
+- Ad / Analytics Relationships
+    - relations.sh 
+        - `bash ~/Tools/relations.sh -d tesla.com`
+- Perform DNS recon on interesting subs
+    - `dnsrecon -t axfr -d domain`
+- Favicon?
 
 ### TLDs to target
 - 
 - 
 - 
 
-# Step 2 - Automated Recon
-- Run ars0n for automated enumeration to cover most beginning steps
-    - https://github.com/R-s0n/ars0n-framework 
-
 # Step 3 - Subdomains 
-1. Review subdomains in ars0n
-2. Review CVE and Nuclei results 
-3. Review Screenshots of subdomains for interesting responses
-4. Perform DNS recon on interesting subs
-    - `dnsrecon -t axfr -d domain`
+- Review subdomains in ars0n
+- Review CVE and Nuclei results 
+- Review Screenshots of subdomains (ars0n Enumeration tab) for interesting responses
+
 
 ### Interesting Subdomains to target
 - 
 - 
 - 
 
-# Step 4 - Check Nuclei + CVE results for low hanging fruit and pointers
-
 ### Interesting Nuclei + CVE results
 - 
 - 
 - 
 
-# Step 5 - Employee Enumeration
-## Github
+# Step 4 - Github Enumeration
 - Find Users with public repos that may be relevant
     - `python3 github-users.py -k floqast`
 - Run github_brute-dork.py 
     - `python3 github_brutedork.py -u blackblastie -t <gh-pat> -o <organization>`
+    - Paste results to ars0n in Recon tab for easy review
+- Github-subdomains
+    - https://github.com/gwen001/github-subdomains
+    - TO DO: Set up GH api tokens with trashmail
+    - TO DO: Once tokens set up, integrate relevant scripts from here
+        - https://github.com/gwen001/github-search/tree/master
+        - https://10degres.net/github-tools-collection/  
+- Dora
+    - https://github.com/sdushantha/dora#example-use-cases 
 - Run Trufflehog against interesting users and/or repos
     - `curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <gh-pat>" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/users/<USERNAME>/repos?per_page=100 | jq .[].git_url -r | sed 's/git:/https:/' | sudo xargs -I % trufflehog github --repo=%`
-    
+- Check any found secrets for validity
+    - https://github.com/streaak/keyhacks
+    - https://github.com/gwen001/keyhacks.sh 
 
-# Step 6 - Cloud
+# Step 5 - Cloud
 - Run fire-cloud.py
 - Gather IPs from Wildfire.py scan and run through ip2provider.py
     - ip-parser.py
@@ -69,36 +100,58 @@ Identify TLDs
 - 
 - 
 
-# Step 7 - Manual Testing
+# Step 6 - Hands On Testing
 ### Take all interesting endpoints and manually test them
 ### Application Analysis
 
 - What stack/languages are used?
+
 - What server is running the application?
+ 
 - Is there a WAF?
+ 
 -  What additional libraries are used? Are there known exploits for these libraries?  Custom JS Llbraries?
+ 
 - Is there Authentication? 
-    - OAuth through Google/Facebook
+ 
 - What Objects are used?
+ 
 - How is session established?
+ 
 - Are there useful comments?
-- How does it handle special characters?
+ 
 - What common features are present?
+ 
 - How is a user identified?
+ 
 - Are there multiple user roles?
+ 
 - Is there an API?
+ 
 - Is there an Content Management System?
+ 
 - Is there a Content Security Policy?
+ 
 - Is CORS implemented?
+ 
 - How does the app pass data?
+ 
 - Are WebSockets used?
+ 
 - How/where does the app talk about users?
+ 
 - Does the site have multi-tenancy?
+ 
 - Is the source code publicly available?
+ 
 - Does the site have a unique threat model?  
+ 
 - Has there been past security research and vulns?
+ 
 - How does the app handle common vuln classes?
+ 
 - Where does the app store data?
+
 
 ### Ask yourself these questions for EVERY page
 
@@ -114,62 +167,82 @@ Identify TLDs
 
 #### Tech Profile  
 - Web Server: 
-- Database: Mongo?  
-- Cloud Provider: Azure and AWS
+- Database:   
+- Cloud Provider: 
 - WAF:
 - CMS:
-- Framework: React
-- Programming Language: JS
-- Other: Lodash (proto pollution)
+- Framework: 
+- Programming Language: 
+- Other: 
 
-### Manual Recon
-- Identify web server, technology, and database
-- Try to locate /robots.txt , /crossdomain.xml /clientaccesspolicy.xml /sitemap.xml and /.well-known/
-- Review comments on source code (Burp Engagement Tools)
-- Content Discovery
+### Content Discovery
+- Try to locate `/robots.txt` , `/crossdomain.xml` `/clientaccesspolicy.xml` `/sitemap.xml` and `/.well-known/`
+- In Content Discovery, we are looking for - Endpoints, parameters, routes, secrets, domains
+- Burp driven 
     - Step 1 - Click through the app 
     - Step 2 - Burp Crawl
     - Step 3 - `Discover Content` in Burp (Right click on target in Target tab)
     - Step 4 - Intruder fuzzing with small raft payload list
+- Directory discovery
+    - Fuzz for directories
+    - Use tech specific wordlists
+        - wordlists.assetnote.io
+        - SecLists
+        - https://github.com/six2dez/OneListForAll
+    - Determine if they are running OSS or COTS
+        - Local install if OSS to find what paths to look for
+        - For paid/COTS, try to get a demo version
+        - Check dockerhub for instances of the software
+        - Look at devs Github's to look for what they may be installing/modifying
+    - Waymore to look for historical content
+        - https://github.com/xnl-h4ck3r/waymore 
+    - XNLinkFinder
+        - Include waymore results
+        - https://github.com/xnl-h4ck3r/xnLinkFinder 
+    - Use GF to look for vulnerable URLs 
+        - https://github.com/1ndianl33t/Gf-Patterns
+    - Recursively brute force paths that return 401, 403
+        - `ffuf -recursion -recursion-depth 1 -u http://192.168.10.10/FUZZ -w /opt/useful/SecLists/Discovery/Web-Content/raft-small-directories-lowercase.txt`
+- JavaScript Analysis
+    - GAP Burp extension
+        - https://github.com/xnl-h4ck3r/GAP-Burp-Extension
+    - For packed or obfuscated JS try 
+        - http://deobfuscate.io/
+        - https://spaceraccoon.github.io/webpack-exploder/ 
+    - Use JS Miner Burp extension
+        - https://portswigger.net/bappstore/0ab7a94d8e11449daaf0fb387431225b 
+    - Jsluice
+        - https://github.com/BishopFox/jsluice 
+        - Endpoint extraction from JS file
+            - Add `function jsurls { jsluice urls <(curl -sk "$1"); }` to .bashrc/.zshrc
+            - `jsurls {link to js file}`
+        - https://github.com/BishopFox/jsluice/tree/main/cmd/jsluice 
+        - https://www.youtube.com/watch?v=BnQBp83YbqY
+    - DOM Invader
+        - https://portswigger.net/burp/documentation/desktop/tools/dom-invader 
 - Web Fuzzing 
+    - Dynamic scanning - the process of injecting payloads into one parameter or value to see if we can trigger a vuln type
     - Burp Param Miner
-    - https://github.com/six2dez/OneListForAll
-    - To Do: Learn more about how and where to fuzz
-- Identify WAF 
-    - https://github.com/Ekultek/WhatWaf
-- Use GF to look for vulnerable URLs 
-    - https://github.com/1ndianl33t/Gf-Patterns
-- Scan for XSS 
-    - https://github.com/hahwul/dalfox
-- Try locate admin panel
-- Analyze JS files via burp 
-    - https://github.com/xnl-h4ck3r/xnLinkFinder
-- Content Discovery via walking the app
-
-### Reverse Proxy Testing
-- HTTP header injection in GET & POST (X Forwarded Host) 
-    - https://pentestbook.six2dez.com/enumeration/web/header-injections
-    - To Do: Build Methodology
-- Abusing Hop Headers
-    - Check for X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI
-    - https://book.hacktricks.xyz/pentesting-web/abusing-hop-by-hop-headers
-- Web Cache Poisoning
-    - To Do: Build Methodology
-- HTTP Request Smuggling 
-    - https://pentestbook.six2dez.com/enumeration/web/request-smuggling
-    - To Do: Build Methodology
-
-#### Interesting Reverse Proxy Testing finds
-- 
-- 
-- 
+    - Burp Active Scan
+    - Backslash powered scanner (burp ext)
+    - Scan Defined Insertion Points in burp intruder
+    - If you want to scan with your own wordlists in intruder
+        - Payloadallthethings
+        - SecLists
 
 ### Client Side Testing
 - Fuzz all request parameters
 - Identify all reflected data
+    - Burp scan with only these two issues enabled
+        - `Input returned in response (reflected)`
+        - `Suspicious input transformation`
 - Reflected XSS 
+    - Scan w/ Dalfox
+        - https://github.com/hahwul/dalfox
     - https://pentestbook.six2dez.com/enumeration/web/xss
-    - To Do: Build Methodology
+    - Use custom burp scan w/ only xss audits enabled
+    - XSS Polyglots
+        - https://github.com/TyrantSec/Fuzzing/blob/master/XSS-Polyglots/99-XSS-Polyglots.txt 
 - Client Side Prototype Pollution
     - TO DO: Build Methodology
     - ars0n custom Nuclei scans
@@ -201,36 +274,134 @@ Identify TLDs
 #### Server Side Testing
 - Command Injection
     - TO DO: Build Methodology
+- RCE
+    - via Referer Header
 - Stored XSS 
     - https://pentestbook.six2dez.com/enumeration/web/xss 
-- Other Stored attacks
+    - Find places users can store data and try injecting payloads
 - Path traversal, LFI and RFI 
+    - Look for endpoints/params that take a path
+    - Look for file uploads
     - https://pentestbook.six2dez.com/enumeration/web/lfi-rfi
 - Server Side Prototype Pollution
     - ars0n custom Nuclei scans
     - TO DO: Build Methodology
 - Insecure Deserialization
     - TO DO: Build Methodology
-- SSRF in previously discovered open ports 
+- SSRF 
     - https://pentestbook.six2dez.com/enumeration/web/ssrf
-    - TO DO: Build Methodology
-- RCE via Referer Header
+    - TIP: some companies auto drop collaborator payloads, look into your own infra if needed
+    - Look for paths or URLs passed as values
+    - Look for these params
+        - dest
+        - redirect
+        - uri
+        - path
+        - continue
+        - url
+        - window
+        - next
+        - data
+        - reference
+        - site
+        - html
+        - val
+        - validate
+        - domain
+        - callback
+        - return
+        - page
+        - feed
+        - host
+        - port
+        - to
+        - out
+        - view
+        - dir
+        - show
+        - navigation
+        - open
+    - Also check 
+        - webhooks
+        - XML 
+        - DOC uploads
+        - headers
+    - Spray and pray
+        - https://iamaakashrathee.medium.com/ssrf-methodology-by-aakash-rathee-f175665e2ea 
+    - Cloud metadata endpoints
+        - https://gist.github.com/jhaddix/78cece26c91c6263653f31ba453e273b
+    - SSRF Payloads and bypasses
+        - https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Request%20Forgery/README.md
+- Open Redirect
+    - Look for paths or URLs passed as values
 - SQL Injection 
     - https://pentestbook.six2dez.com/enumeration/web/sqli 
-    - SQL injection via User-Agent Header
-    - Fuzz other params
-    - To Do: Build Methodology
+    - Look for these params
+        - id
+        - select
+        - report
+        - role
+        - update
+        - query
+        - user
+        - name
+        - sort
+        - where
+        - search
+        - params
+        - process
+        - row
+        - view
+        - table
+        - from
+        - sel
+        - results
+        - sleep
+        - fetch
+        - order
+        - keyword
+        - column
+        - field
+        - delete
+        - string
+        - number
+        - filter 
+    - Tools
+        - Burp Scanner
+        - SQLmap
+        - Ghauri
+            - https://github.com/r0oth3x49/ghauri
+        - Fuzzing headers for Blind SQLi 
+            - https://github.com/SAPT01/HBSQLI
+    - SQLi cheat sheets
+        - https://portswigger.net/web-security/sql-injection/cheat-sheet
+        - https://pentestmonkey.net/category/cheat-sheet/sql-injection
+        - https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/
 - NoSQL Injection 
     - https://pentestbook.six2dez.com/enumeration/webservices/nosql-and-and-mongodb
     - To Do: Build Methodology
-- GraphQL Injection
-    - To Do: Build Methodology
-- File upload: eicar, No Size Limit, File extension, Filter Bypass, burp extension, RCE
-    - TODO: Build methodology
-    - https://pentestbook.six2dez.com/enumeration/web/upload-bypasses
-    - https://secure.eicar.org/eicar.com.txt 
+- File upload
+    - Look for integrations w/ other services that include uploading files to 'smuggle' in payloads
+    - Look for Content-Types
+        - Multipart-forms
+            - Shell, injections
+        - Content type XML
+            - XXE
+            - XXE payloads
+                - https://github.com/payloadbox/xxe-injection-payload-list
+        - Content Type json
+            - API vulns
+    - In depth methodology
+        - https://docs.google.com/presentation/d/1-YwXl9rhzSvvqVvE_bMZo2ab-0O5wRNTnzoihB9x6jI/edit#slide=id.gaf2d2dfef3_0_13
+        - https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+    - Upload bypasses
+        - https://pentestbook.six2dez.com/enumeration/web/upload-bypasses
     - https://github.com/portswigger/upload-scanner
-    - Web shell via file upload
+- APIs
+    - Web Sec Academy GraphQL
+    - Find methods and fuzz for different methods
+    - Fuzz params and fuzz for hidden params
+    - Look for access control violations
 - Server-Side Template Injection
     - TO DO: Build Methodology
 
@@ -252,55 +423,33 @@ Identify TLDs
 - 
 - 
 
-### Authentication
-- Account recovery function
-- "Remember me" function
-- Multi-stage mechanisms (Burp labs)
-- SQL injection 
-    - https://pentestbook.six2dez.com/enumeration/web/sqli
-- Lack of password confirmation on change email, password or 2FA (try change response)
-- Test response tampering in SAML authentication 
-    - https://pentestbook.six2dez.com/enumeration/webservices/onelogin-saml-login
-- In OTP check guessable codes and race conditions
-- OTP, check response manipulation for bypass
-- If JWT, check common flaws 
-    - https://pentestbook.six2dez.com/enumeration/webservices/jwt
+### Access Control / User Management
+- https://pentestbook.six2dez.com/enumeration/web/idor
+- Look for these params
+    - id
+    - user
+    - account
+    - number
+    - order
+    - no 
+    - doc 
+    - key
+    - email
+    - group 
+    - profile
+    - edit
+    - REST numeric paths
+- Autorize 
+    - https://www.youtube.com/watch?v=2WzqH6N-Gbc 
+    - https://www.youtube.com/watch?v=3K1-a7dnA60 
+- Insecure access control methods (request parameters, Referer header, etc)
+    - With privileged user perform privileged actions, try to repeat with unprivileged user cookie.
+    - Try to access things of higher privilege
+    - Try to access other users info/account
+    - Try to find ways to access other parts of the app the user should not
+    - `Access Controls are often applied to the client based on the individual user (accessing a profile page), the user's session (accessing authenticated pages), and the user's role (accessing an admin panel).`
 - After register, logout, clean cache, go to home page and paste your profile url in browser, check for "login?next=accounts/profile" for open redirect or XSS with "/login?next=javascript:alert(1);//"
 2FA/MFA Bypass
-    - To Do: Build Methodology
-- Oauth account takeover
-    - Look at [Oauth methodology](./tech-specific-methodologies/Oauth-Methodology.md)
-- SAML Misconfiguration
-    - to do: build methodology
-- Google Firebase IAM Misconfig
-    - to do: build methodology
-- Keycloack Misconfig
-    - to do: build methodology
-
-#### Interesting Authentication finds
-- 
-- 
-- 
-
-### Session
-- Session fixation (login, log out, resend requests generated before log out)
-- CSRF 
-    - https://pentestbook.six2dez.com/enumeration/web/csrf 
-- Cookie scope
-- Decode cookie
-- Check httpOnly and Secure flags
-- Effectiveness of controls using multiple accounts
-- Insecure access control methods (request parameters, Referer header, etc)
-    - TO DO: build methodology via burp labs
-- Path traversal on cookies
-- With privileged user perform privileged actions, try to repeat with unprivileged user cookie.
-
-#### Interesting Session finds
-- 
-- 
-- 
-
-### User Management
 - Duplicate registration (try with uppercase, +1@..., dots in name, etc)
 - Overwrite existing user (user takeover)
 - Usename unqiueness bypass
@@ -320,25 +469,36 @@ Identify TLDs
 - 
 - 
 
-### Profile/Account Details
-- Find parameter with user id and try to tamper in order to get the details of other users
-- Create a list of features that are pertaining to a user account only and try CSRF
-- Change email id and update with any existing email id. Check if its getting validated on server or not.
-- Check any new email confirmation link and what if user doesn't confirm.
-- CSV import/export: Command Injection, XSS, macro injection
-- Check profile picture URL and find email id/user info or EXIF Geolocation Data
-    - https://github.com/exiftool/exiftool
-- Imagetragick in picture profile upload
-- Metadata of all downloadable files (Geolocation, usernames)
-- Account deletion option and try to reactivate with "Forgot password" feature
-- Try bruteforce enumeration when change any user unique parameter.
-- Try parameter pollution to add two values of same field
-- Check different roles policy
+### Authentication
+- Account recovery function
+- Forgot Password function
+    - Host Header Injection
+        - https://portswigger.net/web-security/host-header/exploiting
+        - https://medium.com/@salman_bugskipper/1-250-worth-of-host-header-injection-96563a2ac7e8
+        - https://infosecwriteups.com/fun-with-header-and-forget-password-with-a-twist-af095b426fb2
+- "Remember me" function
+- Multi-stage mechanisms (Burp labs)
+- Lack of password confirmation on change email, password or 2FA (try change response)
+- Test response tampering in SAML authentication 
+    - https://pentestbook.six2dez.com/enumeration/webservices/onelogin-saml-login
+- MFA
+    - Bypass MFA
+        - build methodology
+    - In OTP check guessable codes and race conditions
+    - OTP, check response manipulation for bypass
+- Oauth account takeover
+    - Look at [Oauth methodology](./tech-specific-methodologies/Oauth-Methodology.md)
+- SAML Misconfiguration
+    - to do: build methodology
+- Google Firebase IAM Misconfig
+    - to do: build methodology
+- Keycloack Misconfig
+    - to do: build methodology
 
-#### Interesting Account/Profile finds
--
+#### Interesting Authentication finds
 - 
--  
+- 
+- 
 
 ### Forgot/reset password
 - Invalidate session on Logout and Password reset
@@ -367,16 +527,33 @@ Identify TLDs
 - 
 
 
-### Application Logic Testing
-- IDOR 
-    - https://pentestbook.six2dez.com/enumeration/web/idor
-- Access Controls
-    - Try to access things of higher privilege
-    - Try to access other users info/account
-    - Try to find ways to access other parts of the app the user should not
-    - `Access Controls are often applied to the client based on the individual user (accessing a profile page), the user's session (accessing authenticated pages), and the user's role (accessing an admin panel).`
+### Session
+- If JWT, check common flaws 
+    - https://pentestbook.six2dez.com/enumeration/webservices/jwt
+- Session fixation (login, log out, resend requests generated before log out)
+- CSRF 
+    - https://pentestbook.six2dez.com/enumeration/web/csrf 
+- Cookie scope
+- Decode cookie
+- Check httpOnly and Secure flags
+- Effectiveness of controls using multiple accounts
+- https://github.com/dub-flow/sessionprobe 
+- Path traversal on cookies
 
-#### Interesting Application Logic finds
+#### Interesting Session finds
 - 
 - 
 - 
+
+### Reverse Proxy Testing
+- HTTP header injection in GET & POST (X Forwarded Host) 
+    - https://pentestbook.six2dez.com/enumeration/web/header-injections
+    - To Do: Build Methodology
+- Abusing Hop Headers
+    - Check for X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI, X-Forwarded-Host, X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Port, X-Forwarded-Server, X-Forwarded-URI
+    - https://book.hacktricks.xyz/pentesting-web/abusing-hop-by-hop-headers
+- Web Cache Poisoning
+    - To Do: Build Methodology
+- HTTP Request Smuggling 
+    - https://pentestbook.six2dez.com/enumeration/web/request-smuggling
+    - To Do: Build Methodology
