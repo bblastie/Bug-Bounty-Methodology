@@ -23,10 +23,10 @@
         - `echo AS394161 | asnmap -silent | naabu -silent -nmap-cli 'nmap -sV'`
     - ars0n data set 
         - `python3 ip-parser.py` 
-        - `cat ../temp/floqast.app.txt | naabu -p - -silent -nmap-cli 'nmap -sV'`
+        - `cat ../temp/floqast.app.txt | naabu -top-ports 1000  -silent -nmap-cli 'nmap -sV'`
 - Shodan Passive Anaylsis
     - Karmav2 
-        - `bash karma_v2 -d tesla.com --limit -1 -deep`
+        - `bash karma_v2 -d tesla.com --limit -1 -deep |tee karmav2.txt`
     - Shosubgo
         - `shosubgo -d tesla.com -s YOURAPIKEY`
     - smap
@@ -39,26 +39,10 @@
     - `dnsrecon -t axfr -d domain`
 - Favicon?
 
-### TLDs to target
-- 
-- 
-- 
-
 # Step 3 - Subdomains 
 - Review subdomains in ars0n
 - Review CVE and Nuclei results 
 - Review Screenshots of subdomains (ars0n Enumeration tab) for interesting responses
-
-
-### Interesting Subdomains to target
-- 
-- 
-- 
-
-### Interesting Nuclei + CVE results
-- 
-- 
-- 
 
 # Step 4 - Github Enumeration
 - Find Users with public repos that may be relevant
@@ -66,12 +50,6 @@
 - Run github_brute-dork.py 
     - `python3 github_brutedork.py -u blackblastie -t <gh-pat> -o <organization>`
     - Paste results to ars0n in Recon tab for easy review
-- Github-subdomains
-    - https://github.com/gwen001/github-subdomains
-    - TO DO: Set up GH api tokens with trashmail
-    - TO DO: Once tokens set up, integrate relevant scripts from here
-        - https://github.com/gwen001/github-search/tree/master
-        - https://10degres.net/github-tools-collection/  
 - Dora
     - https://github.com/sdushantha/dora#example-use-cases 
 - Run Trufflehog against interesting users and/or repos
@@ -85,8 +63,6 @@
 - Gather IPs from Wildfire.py scan and run through ip2provider.py
     - ip-parser.py
     - Run Masscan 
-    - TO DO: Add details from Jhaddix course 
-    - TO DO: Figure out how to make use of Cloud Recon 
 - Manually run cloud-enum
     - https://github.com/initstring/cloud_enum 
 - AADInternals as Outsider
@@ -94,11 +70,6 @@
     - `import-module AADInternals`
     - `Invoke-AADIntReconAsOutsider -Domain "floqast.com" | format-table`
 - Review findings and interesting endpoints
-
-### Interesting Cloud Findings
-- 
-- 
-- 
 
 # Step 6 - Hands On Testing
 ### Take all interesting endpoints and manually test them
@@ -159,12 +130,6 @@
 2. What HTTP request methods can be used? (GET/POST/PUT/DELETE/etc.)
 3. What parameters can be used?
 
-
-#### Analysis notes
-- 
-- 
-- 
-
 #### Tech Profile  
 - Web Server: 
 - Database:   
@@ -185,6 +150,7 @@
     - Step 4 - Intruder fuzzing with small raft payload list
 - Directory discovery
     - Fuzz for directories
+        - https://www.acceis.fr/ffuf-advanced-tricks/
     - Use tech specific wordlists
         - wordlists.assetnote.io
         - SecLists
@@ -247,6 +213,7 @@
     - TO DO: Build Methodology
     - ars0n custom Nuclei scans
 - Client Side Template Injection
+    - https://github.com/Hackmanit/TInjA
     - TO DO: Build Methodology
 - PostMessage Vulnerabilities
     - TO DO: Build Methodology
@@ -265,11 +232,6 @@
         - https://pentestbook.six2dez.com/enumeration/web/xxe
 - Try to discover hidden parameters 
     - https://github.com/s0md3v/Arjun
-
-#### Interesting Client Side Testing finds
-- 
-- 
-- 
 
 #### Server Side Testing
 - Command Injection
@@ -403,12 +365,8 @@
     - Fuzz params and fuzz for hidden params
     - Look for access control violations
 - Server-Side Template Injection
+    - https://github.com/Hackmanit/TInjA
     - TO DO: Build Methodology
-
-#### Interesting Server Side Testing finds
-- 
-- 
-- 
 
 ### Error Handling
 - Access custom pages like /whatever_fake.php (.aspx,.html,.etc)
@@ -417,11 +375,6 @@
 - Generate error by giving input as "/~randomthing/%s" at the end of URL
 - Use Burp Intruder "Fuzzing Full" List in input to generate error codes
 - Try different HTTP Verbs like PATCH, DEBUG or wrong like FAKE
-
-#### Interesting Error Handling finds
-- 
-- 
-- 
 
 ### Access Control / User Management
 - https://pentestbook.six2dez.com/enumeration/web/idor
@@ -464,11 +417,6 @@
 - Try to capture integration url leading integration takeover
 - Check redirections in register page after login 
 
-#### Interesting User Management finds
-- 
-- 
-- 
-
 ### Authentication
 - Account recovery function
 - Forgot Password function
@@ -495,11 +443,6 @@
 - Keycloack Misconfig
     - to do: build methodology
 
-#### Interesting Authentication finds
-- 
-- 
-- 
-
 ### Forgot/reset password
 - Invalidate session on Logout and Password reset
 - Uniqueness of forget password reset link/code
@@ -521,12 +464,6 @@
 - Understand how token is generated (timestamp, username, birthdate,...)
 - Response manipulation
 
-#### Interesting Forgot Password finds
-- 
-- 
-- 
-
-
 ### Session
 - If JWT, check common flaws 
     - https://pentestbook.six2dez.com/enumeration/webservices/jwt
@@ -539,11 +476,6 @@
 - Effectiveness of controls using multiple accounts
 - https://github.com/dub-flow/sessionprobe 
 - Path traversal on cookies
-
-#### Interesting Session finds
-- 
-- 
-- 
 
 ### Reverse Proxy Testing
 - HTTP header injection in GET & POST (X Forwarded Host) 
